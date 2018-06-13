@@ -16,7 +16,7 @@ public class JarInspectorTest {
         JarInspector scanner = new JarInspector(jackson);
 
         assertNotNull(jackson);
-        assertTrue(scanner.isAutomaticModule());
+        assertTrue(scanner.inspect().isAutomaticModule);
     }
 
     @Test
@@ -25,7 +25,7 @@ public class JarInspectorTest {
         JarInspector scanner = new JarInspector(slf4j);
 
         assertNotNull(slf4j);
-        assertFalse(scanner.isAutomaticModule());
+        assertFalse(scanner.inspect().isAutomaticModule);
     }
 
     @Test
@@ -34,7 +34,7 @@ public class JarInspectorTest {
         JarInspector scanner = new JarInspector(slf4j);
 
         assertNotNull(slf4j);
-        assertTrue(scanner.isExplicitModule());
+        assertTrue(scanner.inspect().isExplicitModule);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class JarInspectorTest {
         JarInspector scanner = new JarInspector(jackson);
 
         assertNotNull(jackson);
-        assertFalse(scanner.isExplicitModule());
+        assertFalse(scanner.inspect().isExplicitModule);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class JarInspectorTest {
         JarInspector scanner = new JarInspector(jackson);
 
         assertNotNull(jackson);
-        assertEquals("com.fasterxml.jackson.core", scanner.getModuleName());
+        assertEquals("com.fasterxml.jackson.core", scanner.inspect().modulename);
     }
 
     @Test
@@ -61,7 +61,7 @@ public class JarInspectorTest {
         JarInspector scanner = new JarInspector(slf4j);
 
         assertNotNull(slf4j);
-        assertEquals("org.slf4j", scanner.getModuleName());
+        assertEquals("org.slf4j", scanner.inspect().modulename);
      }
 
      // TODO test with multi-release JARs

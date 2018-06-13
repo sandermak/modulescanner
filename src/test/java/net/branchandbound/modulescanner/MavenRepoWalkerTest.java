@@ -13,7 +13,6 @@ import static org.junit.Assert.*;
 
 public class MavenRepoWalkerTest {
 
-
     @Test
     public void getJarPathsToInspect() {
         MavenRepoWalker repoWalker = new MavenRepoWalker(Paths.get("./src/test/resources/test-maven-repo"), "20170101000000");

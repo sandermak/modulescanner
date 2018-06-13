@@ -16,7 +16,7 @@ public class Main {
         jarPathsToInspect
                 .map(Main::toJarFile)
                 .map(JarInspector::new)
-                .forEach(j -> System.out.println(j.getModuleName()));
+                .forEach(j -> System.out.println(j.inspect()));
 
     }
 

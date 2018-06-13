@@ -2,8 +2,10 @@ package net.branchandbound.modulescanner;
 
 import java.io.IOException;
 import java.lang.module.ModuleDescriptor;
+import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 public class JarInspector {
 
@@ -13,16 +15,14 @@ public class JarInspector {
         this.jarFile = jarFile;
     }
 
-    public boolean isAutomaticModule() {
-            return getAutomaticModuleName() != null;
-    }
-
-    public boolean isExplicitModule() {
-        return getModuleDescriptor().isPresent();
-    }
-
-    public String getModuleName() {
-        return isAutomaticModule() ? getAutomaticModuleName() : getModuleDescriptor().map(ModuleDescriptor::name).orElse(null);
+    public JarInspectResult inspect() {
+        Optional<ModuleDescriptor> descriptor = getModuleDescriptor();
+        boolean isAutomaticModule = getAutomaticModuleName() != null;
+        boolean isExplicitModule = descriptor.isPresent();
+        String modulename =  isAutomaticModule ? getAutomaticModuleName() : descriptor.map(ModuleDescriptor::name).orElse(null);
+        String moduleversion = descriptor.flatMap(ModuleDescriptor::version).map(v -> v.toString()).orElse(null);
+        List<String> dependencies = descriptor.map(ModuleDescriptor::requires).map(s -> s.stream().map(ModuleDescriptor.Requires::name).collect(Collectors.toList())).orElse(List.of());
+        return new JarInspectResult(isAutomaticModule, isExplicitModule, modulename, moduleversion, dependencies);
     }
 
     private Optional<ModuleDescriptor> getModuleDescriptor() {
@@ -45,6 +45,33 @@ public class JarInspector {
         } catch (IOException ioe) {
             ioe.printStackTrace();
             return null;
+        }
+    }
+
+    public static class JarInspectResult {
+        public final boolean isAutomaticModule;
+        public final boolean isExplicitModule;
+        public final String modulename;
+        public final String moduleversion;
+        public final List<String> dependencies;
+
+        public JarInspectResult(boolean isAutomaticModule, boolean isExplicitModule, String modulename, String moduleversion, List<String> dependencies) {
+            this.isAutomaticModule = isAutomaticModule;
+            this.isExplicitModule = isExplicitModule;
+            this.modulename = modulename;
+            this.moduleversion = moduleversion;
+            this.dependencies = dependencies;
+        }
+
+        @Override
+        public String toString() {
+            return "JarInspectResult{" +
+                    "isAutomaticModule=" + isAutomaticModule +
+                    ", isExplicitModule=" + isExplicitModule +
+                    ", modulename='" + modulename + '\'' +
+                    ", moduleversion='" + moduleversion + '\'' +
+                    ", dependencies=" + dependencies +
+                    '}';
         }
     }
 }
