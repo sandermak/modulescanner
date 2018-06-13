@@ -17,9 +17,10 @@ public class JarInspector {
 
     public JarInspectResult inspect() {
         Optional<ModuleDescriptor> descriptor = getModuleDescriptor();
-        boolean isAutomaticModule = getAutomaticModuleName() != null;
+        String automaticModuleName = getAutomaticModuleName();
+        boolean isAutomaticModule = automaticModuleName != null;
         boolean isExplicitModule = descriptor.isPresent();
-        String modulename =  isAutomaticModule ? getAutomaticModuleName() : descriptor.map(ModuleDescriptor::name).orElse(null);
+        String modulename =  isAutomaticModule ? automaticModuleName : descriptor.map(ModuleDescriptor::name).orElse(null);
         String moduleversion = descriptor.flatMap(ModuleDescriptor::version).map(v -> v.toString()).orElse(null);
         List<String> dependencies = descriptor.map(ModuleDescriptor::requires).map(s -> s.stream().map(ModuleDescriptor.Requires::name).collect(Collectors.toList())).orElse(List.of());
         return new JarInspectResult(isAutomaticModule, isExplicitModule, modulename, moduleversion, dependencies);

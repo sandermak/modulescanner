@@ -16,9 +16,11 @@ public class MavenRepoWalker {
     private String cutoffTimestamp;
 
     private static final String versionTag = "<latest>";
+    private static final String groupIdTag = "<groupId>";
     private static final String artifactIdTag = "<artifactId>";
     private static final String lastupdatedTag = "<lastUpdated>";
     private static final Pattern extractVersionPattern = Pattern.compile(versionTag + "(.*)</latest>");
+    private static final Pattern extractGroupIdPattern = Pattern.compile(groupIdTag + "(.*)</groupId>");
     private static final Pattern extractArtifactIdPattern = Pattern.compile(artifactIdTag + "(.*)</artifactId>");
     private static final Pattern lastupdatedPattern = Pattern.compile(lastupdatedTag + "(.*)</lastUpdated>");
 
@@ -27,35 +29,32 @@ public class MavenRepoWalker {
         this.cutoffTimestamp = cutoffTimestamp;
     }
 
-    public Stream<Path> getJarPathsToInspect() {
+    public Stream<MavenArtifact> getArtifactsToInspect() {
         try {
             return Files.find(root, 100, (path, attrs) -> path.endsWith("maven-metadata.xml"))
-                        .flatMap(this::getLatestJar);
+                        .flatMap(this::getLatestMavenArtifact);
         } catch (IOException ioe) {
             ioe.printStackTrace();
             return Stream.empty();
         }
     }
 
-    private Stream<Path> getLatestJar(Path path) {
+    private Stream<MavenArtifact> getLatestMavenArtifact(Path path) {
         try {
-            Path artifactsDir = path.getParent();
-            Optional<String> latestArtifactName = getLatestArtifactLocation(path);
+            List<String> lines = Files.readAllLines(path);
+            String groupId = findAndExtract(lines.stream(), groupIdTag, extractGroupIdPattern);
+            String artifactId = findAndExtract(lines.stream(), artifactIdTag, extractArtifactIdPattern);
+            String latestVersion = findAndExtract(lines.stream(), versionTag, extractVersionPattern);
+            String timestamp = findAndExtract(lines.stream(), lastupdatedTag, lastupdatedPattern);
+            String relativeLocation = latestVersion + File.separator + artifactId + "-" + latestVersion + ".jar";
 
-            return latestArtifactName.map(a -> artifactsDir.resolve(a)).stream();
+            MavenArtifact artifact = new MavenArtifact(groupId, artifactId, latestVersion, path.getParent().resolve(relativeLocation));
+
+            return timestamp.compareTo(cutoffTimestamp) > 0 ? Stream.of(artifact) : Stream.empty();
         } catch (Exception ioe) {
             System.out.println("Could not process " + path);
             return Stream.empty();
         }
-    }
-
-    private Optional<String> getLatestArtifactLocation(Path path) throws IOException {
-        List<String> lines = Files.readAllLines(path);
-        String artifactId = findAndExtract(lines.stream(), artifactIdTag, extractArtifactIdPattern);
-        String latestVersion = findAndExtract(lines.stream(), versionTag, extractVersionPattern);
-        String timestamp = findAndExtract(lines.stream(), lastupdatedTag, lastupdatedPattern);
-
-        return timestamp.compareTo(cutoffTimestamp) > 0 ? Optional.of(latestVersion + File.separator + artifactId + "-" + latestVersion + ".jar") : Optional.empty();
     }
 
     private String findAndExtract(Stream<String> stream, String tag, Pattern pattern) {
@@ -67,4 +66,27 @@ public class MavenRepoWalker {
                 }).findFirst().orElseThrow();
     }
 
+    public static class MavenArtifact {
+        public final String groupId;
+        public final String artifactId;
+        public final String version;
+        public final Path path;
+
+        public MavenArtifact(String groupId, String artifactId, String version, Path path) {
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.version = version;
+            this.path = path;
+        }
+
+        @Override
+        public String toString() {
+            return "MavenArtifact{" +
+                    "groupId='" + groupId + '\'' +
+                    ", artifactId='" + artifactId + '\'' +
+                    ", version='" + version + '\'' +
+                    ", path=" + path +
+                    '}';
+        }
+    }
 }

@@ -8,61 +8,27 @@ import static org.junit.Assert.*;
 
 public class JarInspectorTest {
 
-
     @Test
-    public void jacksonIsAutomaticModule() throws Exception {
-
+    public void testJacksonAutomaticModule() throws Exception {
         JarFile jackson = new JarFile("./src/test/resources/jackson-core-2.9.6.jar");
-        JarInspector scanner = new JarInspector(jackson);
+        JarInspector.JarInspectResult jacksonResult = new JarInspector(jackson).inspect();
 
         assertNotNull(jackson);
-        assertTrue(scanner.inspect().isAutomaticModule);
+        assertTrue(jacksonResult.isAutomaticModule);
+        assertFalse(jacksonResult.isExplicitModule);
+        assertEquals("com.fasterxml.jackson.core", jacksonResult.modulename);
     }
 
     @Test
-    public void slf4jIsNotAutomaticModule() throws Exception {
+    public void testSlf4jExplicitModule() throws Exception {
         JarFile slf4j = new JarFile("./src/test/resources/slf4j-api-1.8.0-beta2.jar");
-        JarInspector scanner = new JarInspector(slf4j);
+        JarInspector.JarInspectResult slf4jResult = new JarInspector(slf4j).inspect();
 
         assertNotNull(slf4j);
-        assertFalse(scanner.inspect().isAutomaticModule);
+        assertFalse(slf4jResult.isAutomaticModule);
+        assertTrue(slf4jResult.isExplicitModule);
+        assertEquals("org.slf4j", slf4jResult.modulename);
     }
-
-    @Test
-    public void slf4jIsExplicitModule() throws Exception {
-        JarFile slf4j = new JarFile("./src/test/resources/slf4j-api-1.8.0-beta2.jar");
-        JarInspector scanner = new JarInspector(slf4j);
-
-        assertNotNull(slf4j);
-        assertTrue(scanner.inspect().isExplicitModule);
-    }
-
-    @Test
-    public void jacksonIsNotExplicitModule() throws Exception {
-        JarFile jackson = new JarFile("./src/test/resources/jackson-core-2.9.6.jar");
-        JarInspector scanner = new JarInspector(jackson);
-
-        assertNotNull(jackson);
-        assertFalse(scanner.inspect().isExplicitModule);
-    }
-
-    @Test
-    public void jacksonModuleName() throws Exception {
-        JarFile jackson = new JarFile("./src/test/resources/jackson-core-2.9.6.jar");
-        JarInspector scanner = new JarInspector(jackson);
-
-        assertNotNull(jackson);
-        assertEquals("com.fasterxml.jackson.core", scanner.inspect().modulename);
-    }
-
-    @Test
-    public void slf4jModuleName() throws Exception {
-        JarFile slf4j = new JarFile("./src/test/resources/slf4j-api-1.8.0-beta2.jar");
-        JarInspector scanner = new JarInspector(slf4j);
-
-        assertNotNull(slf4j);
-        assertEquals("org.slf4j", scanner.inspect().modulename);
-     }
 
      // TODO test with multi-release JARs
 }
