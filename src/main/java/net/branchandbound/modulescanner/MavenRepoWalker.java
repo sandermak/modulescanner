@@ -1,7 +1,7 @@
 package net.branchandbound.modulescanner;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -30,13 +30,12 @@ public class MavenRepoWalker {
             ioe.printStackTrace();
             return Stream.empty();
         }
-
     }
 
     private Stream<Path> getLatestJar(Path path) {
         try {
             Path artifactsDir = path.getParent();
-            Optional<String> latestArtifactName = getLatestArtifactName(path);
+            Optional<String> latestArtifactName = getLatestArtifactLocation(path);
 
             return latestArtifactName.map(a -> artifactsDir.resolve(a)).stream();
         } catch (Exception ioe) {
@@ -45,12 +44,12 @@ public class MavenRepoWalker {
         }
     }
 
-    private Optional<String> getLatestArtifactName(Path path) throws IOException {
+    private Optional<String> getLatestArtifactLocation(Path path) throws IOException {
         List<String> lines = Files.readAllLines(path);
         String artifactId = findAndExtract(lines.stream(), artifactIdTag, extractArtifactIdPattern);
         String latestVersion = findAndExtract(lines.stream(), versionTag, extractVersionPattern);
 
-        return Optional.of(artifactId + "-" + latestVersion + ".jar");
+        return Optional.of(latestVersion + File.separator + artifactId + "-" + latestVersion + ".jar");
     }
 
     private String findAndExtract(Stream<String> stream, String tag, Pattern pattern) {
