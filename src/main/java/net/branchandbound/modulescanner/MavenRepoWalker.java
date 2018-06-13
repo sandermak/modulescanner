@@ -13,13 +13,18 @@ import java.util.stream.Stream;
 public class MavenRepoWalker {
 
     private Path root;
+    private String cutoffTimestamp;
+
     private static final String versionTag = "<latest>";
     private static final String artifactIdTag = "<artifactId>";
+    private static final String lastupdatedTag = "<lastUpdated>";
     private static final Pattern extractVersionPattern = Pattern.compile(versionTag + "(.*)</latest>");
     private static final Pattern extractArtifactIdPattern = Pattern.compile(artifactIdTag + "(.*)</artifactId>");
+    private static final Pattern lastupdatedPattern = Pattern.compile(lastupdatedTag + "(.*)</lastUpdated>");
 
-    public MavenRepoWalker(Path root) {
+    public MavenRepoWalker(Path root, String cutoffTimestamp) {
         this.root = root;
+        this.cutoffTimestamp = cutoffTimestamp;
     }
 
     public Stream<Path> getJarPathsToInspect() {
@@ -48,8 +53,9 @@ public class MavenRepoWalker {
         List<String> lines = Files.readAllLines(path);
         String artifactId = findAndExtract(lines.stream(), artifactIdTag, extractArtifactIdPattern);
         String latestVersion = findAndExtract(lines.stream(), versionTag, extractVersionPattern);
+        String timestamp = findAndExtract(lines.stream(), lastupdatedTag, lastupdatedPattern);
 
-        return Optional.of(latestVersion + File.separator + artifactId + "-" + latestVersion + ".jar");
+        return timestamp.compareTo(cutoffTimestamp) > 0 ? Optional.of(latestVersion + File.separator + artifactId + "-" + latestVersion + ".jar") : Optional.empty();
     }
 
     private String findAndExtract(Stream<String> stream, String tag, Pattern pattern) {
