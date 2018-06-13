@@ -27,8 +27,19 @@ public class JarInspectorTest {
         assertNotNull(slf4j);
         assertFalse(slf4jResult.isAutomaticModule);
         assertTrue(slf4jResult.isExplicitModule);
+        assertTrue(slf4jResult.dependencies.contains("java.base"));
         assertEquals("org.slf4j", slf4jResult.modulename);
     }
 
+    @Test
+    public void testCommonsLangNonmodularJar() throws Exception {
+        JarFile commonslang = new JarFile("./src/test/resources/commons-lang-2.6.jar");
+        JarInspector.JarInspectResult commonslangResult = new JarInspector(commonslang).inspect();
+        
+        assertFalse(commonslangResult.isAutomaticModule);
+        assertFalse(commonslangResult.isExplicitModule);
+        assertNull(commonslangResult.modulename);
+        assertNull(commonslangResult.moduleversion);
+    }
      // TODO test with multi-release JARs
 }
