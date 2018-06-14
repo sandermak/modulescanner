@@ -6,12 +6,12 @@ import java.util.jar.JarFile;
 
 import static org.junit.Assert.*;
 
-public class JarInspectorTest {
+public class ModuleInspectorTest {
 
     @Test
     public void testJacksonAutomaticModule() throws Exception {
         JarFile jackson = new JarFile("./src/test/resources/jackson-core-2.9.6.jar");
-        JarInspector.JarInspectResult jacksonResult = new JarInspector(jackson).inspect();
+        ModuleInspector.ModuleInspectResult jacksonResult = new ModuleInspector(jackson).inspect();
 
         assertNotNull(jackson);
         assertTrue(jacksonResult.isAutomaticModule);
@@ -22,7 +22,7 @@ public class JarInspectorTest {
     @Test
     public void testSlf4jExplicitModule() throws Exception {
         JarFile slf4j = new JarFile("./src/test/resources/slf4j-api-1.8.0-beta2.jar");
-        JarInspector.JarInspectResult slf4jResult = new JarInspector(slf4j).inspect();
+        ModuleInspector.ModuleInspectResult slf4jResult = new ModuleInspector(slf4j).inspect();
 
         assertNotNull(slf4j);
         assertFalse(slf4jResult.isAutomaticModule);
@@ -34,7 +34,7 @@ public class JarInspectorTest {
     @Test
     public void testCommonsLangNonmodularJar() throws Exception {
         JarFile commonslang = new JarFile("./src/test/resources/commons-lang-2.6.jar");
-        JarInspector.JarInspectResult commonslangResult = new JarInspector(commonslang).inspect();
+        ModuleInspector.ModuleInspectResult commonslangResult = new ModuleInspector(commonslang).inspect();
 
         assertFalse(commonslangResult.isAutomaticModule);
         assertFalse(commonslangResult.isExplicitModule);

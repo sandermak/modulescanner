@@ -14,7 +14,7 @@ public class Main {
         new MavenRepoWalker(dir, cutoff).getArtifactsToInspect()
                 .forEach(artifact -> {
                     JarFile jarFile = toJarFile(artifact.path);
-                    JarInspector.JarInspectResult result1 = new JarInspector(jarFile).inspect();
+                    ModuleInspector.ModuleInspectResult result1 = new ModuleInspector(jarFile).inspect();
                     JdepsInspector.JdepsInspectResult result2  = new JdepsInspector(artifact.path).inspect();
                     System.out.println(artifact + "\n -> " + result1 + "\n -> " + result2);
                 });

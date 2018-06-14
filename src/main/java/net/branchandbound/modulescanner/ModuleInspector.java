@@ -7,15 +7,15 @@ import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
-public class JarInspector {
+public class ModuleInspector {
 
     private JarFile jarFile;
 
-    public JarInspector(JarFile jarFile) {
+    public ModuleInspector(JarFile jarFile) {
         this.jarFile = jarFile;
     }
 
-    public JarInspectResult inspect() {
+    public ModuleInspectResult inspect() {
         Optional<ModuleDescriptor> descriptor = getModuleDescriptor();
         String automaticModuleName = getAutomaticModuleName();
         boolean isAutomaticModule = automaticModuleName != null;
@@ -23,7 +23,7 @@ public class JarInspector {
         String modulename =  isAutomaticModule ? automaticModuleName : descriptor.map(ModuleDescriptor::name).orElse(null);
         String moduleversion = descriptor.flatMap(ModuleDescriptor::version).map(v -> v.toString()).orElse(null);
         List<String> dependencies = descriptor.map(ModuleDescriptor::requires).map(s -> s.stream().map(ModuleDescriptor.Requires::name).collect(Collectors.toList())).orElse(List.of());
-        return new JarInspectResult(isAutomaticModule, isExplicitModule, modulename, moduleversion, dependencies);
+        return new ModuleInspectResult(isAutomaticModule, isExplicitModule, modulename, moduleversion, dependencies);
     }
 
     private Optional<ModuleDescriptor> getModuleDescriptor() {
@@ -49,14 +49,14 @@ public class JarInspector {
         }
     }
 
-    public static class JarInspectResult {
+    public static class ModuleInspectResult {
         public final boolean isAutomaticModule;
         public final boolean isExplicitModule;
         public final String modulename;
         public final String moduleversion;
         public final List<String> dependencies;
 
-        public JarInspectResult(boolean isAutomaticModule, boolean isExplicitModule, String modulename, String moduleversion, List<String> dependencies) {
+        public ModuleInspectResult(boolean isAutomaticModule, boolean isExplicitModule, String modulename, String moduleversion, List<String> dependencies) {
             this.isAutomaticModule = isAutomaticModule;
             this.isExplicitModule = isExplicitModule;
             this.modulename = modulename;
@@ -66,7 +66,7 @@ public class JarInspector {
 
         @Override
         public String toString() {
-            return "JarInspectResult{" +
+            return "ModuleInspectResult{" +
                     "isAutomaticModule=" + isAutomaticModule +
                     ", isExplicitModule=" + isExplicitModule +
                     ", modulename='" + modulename + '\'' +
