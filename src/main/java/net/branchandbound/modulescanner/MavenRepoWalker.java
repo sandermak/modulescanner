@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -42,23 +41,25 @@ public class MavenRepoWalker {
     private Stream<MavenArtifact> getLatestMavenArtifact(Path path) {
         try {
             List<String> lines = Files.readAllLines(path);
-            String groupId = findAndExtract(lines.stream(), groupIdTag, extractGroupIdPattern);
-            String artifactId = findAndExtract(lines.stream(), artifactIdTag, extractArtifactIdPattern);
-            String latestVersion = findAndExtract(lines.stream(), versionTag, extractVersionPattern);
-            String timestamp = findAndExtract(lines.stream(), lastupdatedTag, lastupdatedPattern);
+            String groupId = findAndExtract(lines, groupIdTag, extractGroupIdPattern);
+            String artifactId = findAndExtract(lines, artifactIdTag, extractArtifactIdPattern);
+            String latestVersion = findAndExtract(lines, versionTag, extractVersionPattern);
+            String timestamp = findAndExtract(lines, lastupdatedTag, lastupdatedPattern);
             String relativeLocation = latestVersion + File.separator + artifactId + "-" + latestVersion + ".jar";
 
             MavenArtifact artifact = new MavenArtifact(groupId, artifactId, latestVersion, path.getParent().resolve(relativeLocation));
 
             return timestamp.compareTo(cutoffTimestamp) > 0 ? Stream.of(artifact) : Stream.empty();
         } catch (Exception ioe) {
-            System.out.println("Could not process " + path);
+            System.err.println("Could not process " + path);
             return Stream.empty();
         }
     }
 
-    private String findAndExtract(Stream<String> stream, String tag, Pattern pattern) {
-        return stream.filter(l -> l.contains(tag))
+    private String findAndExtract(List<String> lines, String tag, Pattern pattern) {
+        return lines
+                .stream()
+                .filter(l -> l.contains(tag))
                 .map(l -> {
                     Matcher m = pattern.matcher(l);
                     m.find();

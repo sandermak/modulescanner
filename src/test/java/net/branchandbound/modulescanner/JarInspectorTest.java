@@ -35,7 +35,7 @@ public class JarInspectorTest {
     public void testCommonsLangNonmodularJar() throws Exception {
         JarFile commonslang = new JarFile("./src/test/resources/commons-lang-2.6.jar");
         JarInspector.JarInspectResult commonslangResult = new JarInspector(commonslang).inspect();
-        
+
         assertFalse(commonslangResult.isAutomaticModule);
         assertFalse(commonslangResult.isExplicitModule);
         assertNull(commonslangResult.modulename);
