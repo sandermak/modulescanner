@@ -13,8 +13,10 @@ public class Main {
 
         new MavenRepoWalker(dir, cutoff).getArtifactsToInspect()
                 .forEach(artifact -> {
-                    JarInspector.JarInspectResult result = new JarInspector(toJarFile(artifact.path)).inspect();
-                    System.out.println(artifact + " -> " + result);
+                    JarFile jarFile = toJarFile(artifact.path);
+                    JarInspector.JarInspectResult result1 = new JarInspector(jarFile).inspect();
+                    JdepsInspector.JdepsInspectResult result2  = new JdepsInspector(artifact.path).inspect();
+                    System.out.println(artifact + "\n -> " + result1 + "\n -> " + result2);
                 });
     }
 
