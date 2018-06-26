@@ -1,4 +1,4 @@
-package net.branchandbound.modulescanner;
+package org.adoptopenjdk.modulescanner;
 
 import java.io.IOException;
 import java.nio.file.Path;

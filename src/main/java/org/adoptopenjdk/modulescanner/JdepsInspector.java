@@ -1,4 +1,4 @@
-package net.branchandbound.modulescanner;
+package org.adoptopenjdk.modulescanner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
