@@ -25,8 +25,7 @@ class JdepsInspectorTest {
 
         System.out.println(result);
         assertFalse(result.toolerror);
-        assertEquals(1, result.violations.size());
-        assertTrue(result.violations.get(0).contains("sun.security.x509.X500Name"));
+        assertLinesMatch(List.of("^sun.security.x509.X500Name.+since 1.4$"), result.violations);
     }
 
     @Test
@@ -43,7 +42,6 @@ class JdepsInspectorTest {
         JdepsInspector.JdepsInspectResult result = inspector.inspect();
 
         assertFalse(result.toolerror);
-        assertEquals(1, result.violations.size());
         assertLinesMatch(List.of("^sun.misc.Unsafe.+$"), result.violations);
     }
 
