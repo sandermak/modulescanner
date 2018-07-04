@@ -1,5 +1,8 @@
 package org.adoptopenjdk.modulescanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -9,7 +12,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.spi.ToolProvider;
 
+/**
+ * This class is responsible for running jdeps on the JAR file it is inspecting
+ * and returning the result of that inspection
+ */
 public class JdepsInspector {
+
+    private static final Logger LOGGER = LogManager.getLogger("JdepsInspector");
 
     private Path jarFile;
 
@@ -17,39 +26,46 @@ public class JdepsInspector {
         this.jarFile = jarFile;
     }
 
+    /**
+     * Find the jdeps tool via the ToolsProvider, run it and then return a result
+     *
+     * @return The result of the jdeps inspection (could be a FAIL)
+     */
     public JdepsInspectResult inspect() {
         Optional<ToolProvider> jdepsTool = ToolProvider.findFirst("jdeps");
 
-        return jdepsTool.map(this::analyzeJdkInternals).orElse(JdepsInspectResult.FAIL_RESULT);
+        return jdepsTool.map(this::analyzeJdkInternals).orElse(JdepsInspectResult.FAIL);
     }
 
+    // Analyse the JDK internals
     private JdepsInspectResult analyzeJdkInternals(ToolProvider jdeps) {
+
         var outbytes = new ByteArrayOutputStream();
         var errbytes = new ByteArrayOutputStream();
 
         try {
             int retVal = jdeps.run(new PrintStream(outbytes), new PrintStream(errbytes), "--jdk-internals", jarFile.toString());
 
-            String out = outbytes.toString(Charset.defaultCharset());
+            String jdepsOutput = outbytes.toString(Charset.defaultCharset());
             String err = errbytes.toString(Charset.defaultCharset());
 
             if (retVal != 0 || (err != null && err.length() > 0)) {
-                return JdepsInspectResult.FAIL_RESULT;
+                return JdepsInspectResult.FAIL;
             }
 
-            return new JdepsInspectResult(false, getViolations(out));
+            return new JdepsInspectResult(false, getViolations(jdepsOutput));
         } catch (RuntimeException re) {
-            System.err.println("Could not process " + jarFile);
-            re.printStackTrace();
-            return JdepsInspectResult.FAIL_RESULT;
+            LOGGER.error("Could not process " + jarFile, re);
+            return JdepsInspectResult.FAIL;
         }
     }
 
-    private List<String> getViolations(String out) {
+    // Return a list of the jdeps violations
+    private List<String> getViolations(String jdepsOutput) {
         String jdepsSeparator = "---------------------";
-        int index = out.lastIndexOf(jdepsSeparator);
+        int index = jdepsOutput.lastIndexOf(jdepsSeparator);
         if (index > 0) {
-            String violations = out.substring(out.lastIndexOf(jdepsSeparator) + jdepsSeparator.length() + 1);
+            String violations = jdepsOutput.substring(jdepsOutput.lastIndexOf(jdepsSeparator) + jdepsSeparator.length() + 1);
             System.out.println(violations);
             return Arrays.asList(violations.split("\\r?\\n"));
         }
@@ -57,13 +73,26 @@ public class JdepsInspector {
         return List.of();
     }
 
+    /**
+     * The result of a jdeps inspection
+     */
     public static class JdepsInspectResult {
 
-        public static JdepsInspectResult FAIL_RESULT = new JdepsInspectResult(true, List.of());
+        /** A status indicating that the scan failed */
+        public static JdepsInspectResult FAIL = new JdepsInspectResult(true, List.of());
 
+        /** Whether the jdeps tool errored or not */
         public final boolean toolerror;
+
+        /** A List of the jdeps violations for this scan */
         public final List<String> violations;
 
+        /**
+         * Constructor
+         *
+         * @param toolerror - Set whether or not jdeps threw an error
+         * @param violations - a List of the violations
+         */
         public JdepsInspectResult(boolean toolerror, List<String> violations) {
             this.toolerror = toolerror;
             this.violations = violations;

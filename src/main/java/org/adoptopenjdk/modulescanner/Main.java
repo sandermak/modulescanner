@@ -1,30 +1,53 @@
 package org.adoptopenjdk.modulescanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.jar.JarFile;
 
+/**
+ * The main entry point into the modulescanner project
+ *
+ * Is currently designed to be run from the CL
+ */
 public class Main {
 
-    public static void main(String[] args) {
-        var dir = Paths.get(args.length > 0 ? args[0] : "../gs-maven-mirror");
-        var cutoff = args.length > 1 ? args[1] : "20170101000000";
+    private static final Logger LOGGER = LogManager.getLogger("Main");
 
-        new MavenRepoWalker(dir, cutoff).getArtifactsToInspect()
+    private static String DEFAULT_DIRECTORY_TO_SCAN = "../gs-maven-mirror";
+    private static String CUTOFF_DATE = "20170101000000";
+
+    /**
+     * Main method - entry point for invoking modulescanner
+     *
+     * @param args Commandline arguments
+     */
+    public static void main(String[] args) {
+        var directoryToScan = Paths.get(args.length > 0 ? args[0] : DEFAULT_DIRECTORY_TO_SCAN);
+        var cutoffDate = args.length > 1 ? args[1] : CUTOFF_DATE;
+
+        new MavenRepoWalker(directoryToScan, cutoffDate).getArtifactsToInspect()
                 .forEach(artifact -> {
-                    JarFile jarFile = toJarFile(artifact.path);
-                    ModuleInspector.ModuleInspectResult result1 = new ModuleInspector(jarFile).inspect();
-                    JdepsInspector.JdepsInspectResult result2  = new JdepsInspector(artifact.path).inspect();
-                    System.out.println(artifact + "\n -> " + result1 + "\n -> " + result2);
+                    JarFile jarFile = toJarFile(directoryToScan);
+                    if (jarFile != null) {
+                        ModuleInspector.ModuleInspectResult moduleInspectorResult = new ModuleInspector(jarFile).inspect();
+                        JdepsInspector.JdepsInspectResult jdepsInspectorResult = new JdepsInspector(artifact.path).inspect();
+                        LOGGER.info(artifact + "\n -> " + moduleInspectorResult + "\n -> " + jdepsInspectorResult);
+                    }
                 });
     }
 
-    private static JarFile toJarFile(Path p) {
+    // Convert a given Path to a Jar file for processing
+    private static JarFile toJarFile(Path path) {
         try {
-            return new JarFile(p.toFile());
+            return new JarFile(path.toFile());
         } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
+            LOGGER.warn("Unable to convert Path: " + path.toAbsolutePath() + " to a JAR file", ioe);
+            return null;
         }
     }
 
