@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.spi.ToolProvider;
+import java.util.stream.Collectors;
 
 public class JdepsInspector {
 
@@ -51,7 +52,8 @@ public class JdepsInspector {
         if (index > 0) {
             String violations = out.substring(out.lastIndexOf(jdepsSeparator) + jdepsSeparator.length() + 1);
             System.out.println(violations);
-            return Arrays.asList(violations.split("\\r?\\n"));
+            // break on any line break, filter blank lines, and collect as list
+            return Arrays.stream(violations.split("\\R")).filter(line -> !line.trim().isEmpty()).collect(Collectors.toList());
         }
 
         return List.of();

@@ -1,15 +1,14 @@
 package org.adoptopenjdk.modulescanner;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Test;
 import java.util.jar.JarFile;
 
-import static org.junit.Assert.*;
-
-public class ModuleInspectorTest {
+class ModuleInspectorTest {
 
     @Test
-    public void testJacksonAutomaticModule() throws Exception {
+    void testJacksonAutomaticModule() throws Exception {
         JarFile jackson = new JarFile("./src/test/resources/jackson-core-2.9.6.jar");
         ModuleInspector.ModuleInspectResult jacksonResult = new ModuleInspector(jackson).inspect();
 
@@ -20,7 +19,7 @@ public class ModuleInspectorTest {
     }
 
     @Test
-    public void testSlf4jExplicitModule() throws Exception {
+    void testSlf4jExplicitModule() throws Exception {
         JarFile slf4j = new JarFile("./src/test/resources/slf4j-api-1.8.0-beta2.jar");
         ModuleInspector.ModuleInspectResult slf4jResult = new ModuleInspector(slf4j).inspect();
 
@@ -32,7 +31,7 @@ public class ModuleInspectorTest {
     }
 
     @Test
-    public void testCommonsLangNonmodularJar() throws Exception {
+    void testCommonsLangNonmodularJar() throws Exception {
         JarFile commonslang = new JarFile("./src/test/resources/commons-lang-2.6.jar");
         ModuleInspector.ModuleInspectResult commonslangResult = new ModuleInspector(commonslang).inspect();
 
@@ -41,5 +40,15 @@ public class ModuleInspectorTest {
         assertNull(commonslangResult.modulename);
         assertNull(commonslangResult.moduleversion);
     }
-     // TODO test with multi-release JARs
+
+    @Test
+    void testJUnitPlatformCommonsMultiReleaseJar() throws Exception {
+        JarFile junit = new JarFile("./src/test/resources/junit-platform-commons-1.2.0.jar");
+        ModuleInspector.ModuleInspectResult junitResult = new ModuleInspector(junit).inspect();
+
+        assertNotNull(junit);
+        assertTrue(junitResult.isAutomaticModule);
+        assertFalse(junitResult.isExplicitModule);
+        assertEquals("org.junit.platform.commons", junitResult.modulename);
+    }
 }
