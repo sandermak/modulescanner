@@ -40,5 +40,15 @@ class ModuleInspectorTest {
         assertNull(commonslangResult.modulename);
         assertNull(commonslangResult.moduleversion);
     }
-     // TODO test with multi-release JARs
+
+    @Test
+    void testJUnitPlatformCommonsMultiReleaseJar() throws Exception {
+        JarFile junit = new JarFile("./src/test/resources/junit-platform-commons-1.2.0.jar");
+        ModuleInspector.ModuleInspectResult junitResult = new ModuleInspector(junit).inspect();
+
+        assertNotNull(junit);
+        assertTrue(junitResult.isAutomaticModule);
+        assertFalse(junitResult.isExplicitModule);
+        assertEquals("org.junit.platform.commons", junitResult.modulename);
+    }
 }
