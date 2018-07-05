@@ -4,9 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Paths;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 
 class JdepsInspectorTest {
+
+    private static final Logger LOGGER = LogManager.getLogger("JdepsInspectorTest");
 
     @Test
     void testNonViolatingJar() {
@@ -23,7 +28,7 @@ class JdepsInspectorTest {
         JdepsInspector inspector = new JdepsInspector(Paths.get("./src/test/resources/netty-handler-4.1.13.Final.jar"));
         JdepsInspector.JdepsInspectResult result = inspector.inspect();
 
-        System.out.println(result);
+        LOGGER.debug(result);
         assertFalse(result.toolerror);
         assertLinesMatch(List.of("^sun.security.x509.X500Name.+since 1.4$"), result.violations);
     }
@@ -44,6 +49,5 @@ class JdepsInspectorTest {
         assertFalse(result.toolerror);
         assertLinesMatch(List.of("^sun.misc.Unsafe.+$"), result.violations);
     }
-
 
 }

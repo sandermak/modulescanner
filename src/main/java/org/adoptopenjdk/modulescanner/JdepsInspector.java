@@ -38,19 +38,19 @@ public class JdepsInspector {
         return jdepsTool.map(this::analyzeJdkInternals).orElse(JdepsInspectResult.FAIL);
     }
 
-    // Analyse the JDK internals
+    // Analyse the JDK internal API usage using jdeps
     private JdepsInspectResult analyzeJdkInternals(ToolProvider jdeps) {
 
         var outbytes = new ByteArrayOutputStream();
         var errbytes = new ByteArrayOutputStream();
 
         try {
-            int retVal = jdeps.run(new PrintStream(outbytes), new PrintStream(errbytes), "--jdk-internals", jarFile.toString());
+            int retVal = jdeps.run(new PrintStream(outbytes, true, Charset.defaultCharset()), new PrintStream(errbytes, true, Charset.defaultCharset()), "--jdk-internals", jarFile.toString());
 
             String jdepsOutput = outbytes.toString(Charset.defaultCharset());
-            String err = errbytes.toString(Charset.defaultCharset());
+            String errorOutput = errbytes.toString(Charset.defaultCharset());
 
-            if (retVal != 0 || (err != null && err.length() > 0)) {
+            if (retVal != 0 || (errorOutput != null && errorOutput.length() > 0)) {
                 return JdepsInspectResult.FAIL;
             }
 
@@ -67,7 +67,7 @@ public class JdepsInspector {
         int index = jdepsOutput.lastIndexOf(jdepsSeparator);
         if (index > 0) {
             String violations = jdepsOutput.substring(jdepsOutput.lastIndexOf(jdepsSeparator) + jdepsSeparator.length() + 1);
-            System.out.println(violations);
+            LOGGER.info(violations);
             // break on any line break, filter blank lines, and collect as list
             return Arrays.stream(violations.split("\\R")).filter(line -> !line.trim().isEmpty()).collect(Collectors.toList());
         }
@@ -81,7 +81,7 @@ public class JdepsInspector {
     public static class JdepsInspectResult {
 
         /** A status indicating that the scan failed */
-        public static JdepsInspectResult FAIL = new JdepsInspectResult(true, List.of());
+        public static final JdepsInspectResult FAIL = new JdepsInspectResult(true, List.of());
 
         /** Whether the jdeps tool errored or not */
         public final boolean toolerror;
