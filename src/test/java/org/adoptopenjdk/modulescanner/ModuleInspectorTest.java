@@ -51,4 +51,51 @@ class ModuleInspectorTest {
         assertFalse(junitResult.isExplicitModule);
         assertEquals("org.junit.platform.commons", junitResult.modulename);
     }
+
+    /**
+     * {@code jar --list --file mrjar.jar}
+     *
+     * <pre><code>
+     * META-INF/
+     * META-INF/MANIFEST.MF
+     * com/
+     * com/acme/
+     * com/acme/JdkSpecific.class
+     * com/acme/Shared.class
+     * META-INF/versions/
+     * META-INF/versions/9/
+     * META-INF/versions/9/com/
+     * META-INF/versions/9/com/acme/
+     * META-INF/versions/9/com/acme/JdkSpecific.class
+     * META-INF/versions/9/module-info.class
+     * </code></pre>
+     *
+     * <p>{@code jar --describe-module --file mrjar.jar}
+     *
+     * <pre><code>
+     * releases: 9
+     *
+     * No root module descriptor, specify --release
+     * </code></pre>
+     *
+     * <p>{@code jar --describe-module --file mrjar.jar --release 9}
+     *
+     * <pre><code>
+     * releases: 9
+     *
+     * com.acme jar:file:///[...]/mrjar.jar/!META-INF/versions/9/module-info.class
+     * exports com.acme
+     * requires java.base mandated
+     * </code></pre>
+     */
+    @Test
+    void testMultiReleaseJarWithCompiledModuleDescriptorInVersionsDirectory() throws Exception {
+        JarFile mrjar = new JarFile("./src/test/resources/mrjar.jar");
+        ModuleInspector.ModuleInspectResult mrjarResult = new ModuleInspector(mrjar).inspect();
+
+        assertNotNull(mrjar);
+        assertFalse(mrjarResult.isAutomaticModule);
+        assertTrue(mrjarResult.isExplicitModule);
+        assertEquals("com.acme", mrjarResult.modulename);
+    }
 }
