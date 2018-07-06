@@ -31,7 +31,7 @@ public class Main {
 
         new MavenRepoWalker(directoryToScan, cutoffDate).getArtifactsToInspect()
                 .forEach(artifact -> {
-                    JarFile jarFile = toJarFile(directoryToScan);
+                    JarFile jarFile = toJarFile(artifact.path);
                     if (jarFile != null) {
                         ModuleInspector.ModuleInspectResult moduleInspectorResult = new ModuleInspector(jarFile).inspect();
                         JdepsInspector.JdepsInspectResult jdepsInspectorResult = new JdepsInspector(artifact.path).inspect();
