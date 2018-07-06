@@ -15,7 +15,7 @@ class ModuleInspectorTest {
         assertNotNull(jackson);
         assertTrue(jacksonResult.isAutomaticModule);
         assertFalse(jacksonResult.isExplicitModule);
-        assertEquals("com.fasterxml.jackson.core", jacksonResult.modulename);
+        assertEquals("com.fasterxml.jackson.core", jacksonResult.moduleName);
     }
 
     @Test
@@ -27,7 +27,7 @@ class ModuleInspectorTest {
         assertFalse(slf4jResult.isAutomaticModule);
         assertTrue(slf4jResult.isExplicitModule);
         assertTrue(slf4jResult.dependencies.contains("java.base"));
-        assertEquals("org.slf4j", slf4jResult.modulename);
+        assertEquals("org.slf4j", slf4jResult.moduleName);
     }
 
     @Test
@@ -37,8 +37,8 @@ class ModuleInspectorTest {
 
         assertFalse(commonslangResult.isAutomaticModule);
         assertFalse(commonslangResult.isExplicitModule);
-        assertNull(commonslangResult.modulename);
-        assertNull(commonslangResult.moduleversion);
+        assertNull(commonslangResult.moduleName);
+        assertNull(commonslangResult.moduleVersion);
     }
 
     @Test
@@ -49,7 +49,7 @@ class ModuleInspectorTest {
         assertNotNull(junit);
         assertTrue(junitResult.isAutomaticModule);
         assertFalse(junitResult.isExplicitModule);
-        assertEquals("org.junit.platform.commons", junitResult.modulename);
+        assertEquals("org.junit.platform.commons", junitResult.moduleName);
     }
 
     /**
@@ -96,6 +96,6 @@ class ModuleInspectorTest {
         assertNotNull(mrjar);
         assertFalse(mrjarResult.isAutomaticModule);
         assertTrue(mrjarResult.isExplicitModule);
-        assertEquals("com.acme", mrjarResult.modulename);
+        assertEquals("com.acme", mrjarResult.moduleName);
     }
 }
