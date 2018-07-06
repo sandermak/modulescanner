@@ -56,7 +56,8 @@ public class JdepsInspector {
 
             return new JdepsInspectResult(false, getViolations(jdepsOutput));
         } catch (RuntimeException re) {
-            LOGGER.error("Could not process " + jarFile, re);
+            LOGGER.error("Could not process " + jarFile);
+            LOGGER.trace(re);
             return JdepsInspectResult.FAIL;
         }
     }
