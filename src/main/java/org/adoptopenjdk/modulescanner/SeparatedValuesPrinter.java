@@ -5,14 +5,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.adoptopenjdk.modulescanner.MavenRepoWalker.MavenArtifact;
 import org.adoptopenjdk.modulescanner.ModuleInspector.ModuleInspectResult;
+import org.adoptopenjdk.modulescanner.JdepsInspector.JdepsInspectResult;
 
-class CsvPrinter {
+class SeparatedValuesPrinter {
 
 	private final PrintWriter out;
 	private final String delimiter;
 	private final AtomicInteger lineCounter;
 
-	CsvPrinter(PrintWriter out, String delimiter) {
+	SeparatedValuesPrinter(PrintWriter out, String delimiter) {
 		this.out = out;
 		this.delimiter = delimiter;
 		this.lineCounter = new AtomicInteger();
@@ -32,21 +33,26 @@ class CsvPrinter {
 				"moduleName",
 				"moduleVersion",
 				"moduleMode",
-				"moduleDependencies");
+				"moduleDependencies",
+				"jdepsToolError",
+				"jdepsViolations");
 		return String.join(delimiter, columns);
 	}
 
 	// Create single CSV line from artifact and module inspection result
 	// Note: Keep in sync with #generateHeaderLine
-	private String generateLine(MavenArtifact artifact, ModuleInspectResult mir) {
+	private String generateLine(MavenArtifact artifact, ModuleInspectResult mir, JdepsInspectResult jir) {
 		var columns = List.of(
 				valueOrDashIfBlank(artifact.groupId),
 				valueOrDashIfBlank(artifact.artifactId),
 				valueOrDashIfBlank(artifact.version),
 				valueOrDashIfBlank(mir.moduleName),
 				valueOrDashIfBlank(mir.moduleVersion),
-				mir.isAutomaticModule ? "automatic" : mir.isExplicitModule ? "explicit" : "-",
-				valueOrDashIfBlank(String.join(" + ", mir.dependencies)));
+				mir.isAutomaticModule ? "automatic" : mir.isExplicitModule ? "explicit" : "?",
+				valueOrDashIfBlank(String.join(" + ", mir.dependencies)),
+				jir.toolerror + "",
+				valueOrDashIfBlank(String.join(" + ", jir.violations))
+				);
 		return String.join(delimiter, columns);
 	}
 
@@ -59,8 +65,8 @@ class CsvPrinter {
 		out.println(generateHeaderLine());
 	}
 
-	void printAndCountLine(MavenArtifact artifact, ModuleInspectResult mir) {
-		out.println(generateLine(artifact, mir));
+	void printAndCountLine(MavenArtifact artifact, ModuleInspectResult mir, JdepsInspectResult jir) {
+		out.println(generateLine(artifact, mir, jir));
 		lineCounter.incrementAndGet();
 	}
 }

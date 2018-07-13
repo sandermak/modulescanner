@@ -24,6 +24,7 @@ public class Main {
     private static String DEFAULT_DIRECTORY_TO_SCAN = "../gs-maven-mirror";
     private static String CUTOFF_DATE = "20170101000000";
     private static String DEFAULT_OUTPUT_FILE_NAME = "modulescanner.csv";
+    private static String DEFAULT_OUTPUT_DELIMITER = ",";
 
     /**
      * Main method - entry point for invoking modulescanner
@@ -45,25 +46,25 @@ public class Main {
 
     // Walk repository and emit CSV file as output
     private static void walk(Path directoryToScan, String cutoffDate, PrintWriter out) {
-        var csv = new CsvPrinter(out, ", ");
-        csv.printHeaderLine();
+        var printer = new SeparatedValuesPrinter(out, DEFAULT_OUTPUT_DELIMITER);
+        printer.printHeaderLine();
 
         new MavenRepoWalker(directoryToScan, cutoffDate)
                 .getArtifactsToInspect()
-                .forEach(artifact -> handleArtifact(artifact, csv));
+                .forEach(artifact -> handleArtifact(artifact, printer));
 
         out.flush();
-        LOGGER.info("Wrote " + csv.getLineCount() + " csv lines");
+        LOGGER.info("Printed " + printer.getLineCount() + " lines");
     }
 
     // Inspect artifact and emit CSV line
-    private static void handleArtifact(MavenArtifact artifact, CsvPrinter csv) {
+    private static void handleArtifact(MavenArtifact artifact, SeparatedValuesPrinter printer) {
         JarFile jarFile = toJarFile(artifact.path);
         if (jarFile != null) {
             var moduleInspectorResult = new ModuleInspector(jarFile).inspect();
             var jdepsInspectorResult = new JdepsInspector(artifact.path).inspect();
             LOGGER.info(artifact + "\n -> " + moduleInspectorResult + "\n -> " + jdepsInspectorResult);
-            csv.printAndCountLine(artifact, moduleInspectorResult);
+            printer.printAndCountLine(artifact, moduleInspectorResult, jdepsInspectorResult);
         }
     }
 

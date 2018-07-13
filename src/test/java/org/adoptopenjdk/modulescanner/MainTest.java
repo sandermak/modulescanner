@@ -11,7 +11,7 @@ class MainTest {
     @Test
     void testCsvOutput() throws Exception {
         var testMavenRepo = Paths.get("src/test/resources/test-maven-repo");
-        var targetOutput = Paths.get("target/actual-modulescanner.csv");
+        var targetOutput = Files.createTempFile("actual-", "-modulescanner.csv");
 
         Main.main(testMavenRepo.toString(), "20170101000000", targetOutput.toString());
 
