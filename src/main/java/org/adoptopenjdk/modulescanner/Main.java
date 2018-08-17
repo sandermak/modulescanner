@@ -36,6 +36,11 @@ public class Main {
         var cutoffDate = args.length > 1 ? args[1] : CUTOFF_DATE;
         var output = Paths.get(args.length > 2 ? args[2] : DEFAULT_OUTPUT_FILE_NAME);
 
+        LOGGER.info("Scanning for modules...");
+        LOGGER.info("  directoryToScan = " + directoryToScan);
+        LOGGER.info("       cutoffDate = " + cutoffDate);
+        LOGGER.info("           output = " + output);
+
         try (var out = new PrintWriter(new BufferedWriter(new FileWriter(output.toFile())))) {
             walk(directoryToScan, cutoffDate, out);
             LOGGER.info("Wrote " + Files.size(output) + " bytes to: " + output);
