@@ -9,7 +9,7 @@ class ModuleInspectorTest {
 
     @Test
     void testJacksonAutomaticModule() throws Exception {
-        JarFile jackson = new JarFile("./src/test/resources/jackson-core-2.9.6.jar");
+        JarFile jackson = new JarFile("./src/test/resources/jars/jackson-core-2.9.6.jar");
         ModuleInspector.ModuleInspectResult jacksonResult = new ModuleInspector(jackson).inspect();
 
         assertNotNull(jackson);
@@ -20,7 +20,7 @@ class ModuleInspectorTest {
 
     @Test
     void testSlf4jExplicitModule() throws Exception {
-        JarFile slf4j = new JarFile("./src/test/resources/slf4j-api-1.8.0-beta2.jar");
+        JarFile slf4j = new JarFile("./src/test/resources/jars/slf4j-api-1.8.0-beta2.jar");
         ModuleInspector.ModuleInspectResult slf4jResult = new ModuleInspector(slf4j).inspect();
 
         assertNotNull(slf4j);
@@ -32,7 +32,7 @@ class ModuleInspectorTest {
 
     @Test
     void testCommonsLangNonmodularJar() throws Exception {
-        JarFile commonslang = new JarFile("./src/test/resources/commons-lang-2.6.jar");
+        JarFile commonslang = new JarFile("./src/test/resources/jars/commons-lang-2.6.jar");
         ModuleInspector.ModuleInspectResult commonslangResult = new ModuleInspector(commonslang).inspect();
 
         assertFalse(commonslangResult.isAutomaticModule);
@@ -43,7 +43,7 @@ class ModuleInspectorTest {
 
     @Test
     void testJUnitPlatformCommonsMultiReleaseJar() throws Exception {
-        JarFile junit = new JarFile("./src/test/resources/junit-platform-commons-1.2.0.jar");
+        JarFile junit = new JarFile("./src/test/resources/jars/junit-platform-commons-1.2.0.jar");
         ModuleInspector.ModuleInspectResult junitResult = new ModuleInspector(junit).inspect();
 
         assertNotNull(junit);
@@ -90,7 +90,7 @@ class ModuleInspectorTest {
      */
     @Test
     void testMultiReleaseJarWithCompiledModuleDescriptorInVersionsDirectory() throws Exception {
-        JarFile mrjar = new JarFile("./src/test/resources/mrjar.jar");
+        JarFile mrjar = new JarFile("./src/test/resources/jars/mrjar.jar");
         ModuleInspector.ModuleInspectResult mrjarResult = new ModuleInspector(mrjar).inspect();
 
         assertNotNull(mrjar);
