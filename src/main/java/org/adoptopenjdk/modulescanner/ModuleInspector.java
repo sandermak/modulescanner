@@ -31,14 +31,15 @@ public class ModuleInspector {
 
     /**
      * Inspect the Maven Artifact for whether it has Automatic and / or
-     * explicit module support.
+     * explicit module support. When both Automatic-Module-Name and a
+     * descriptor are present, the module is categorized as explicit.
      *
      * @return A ModuleInspectionResult
      */
     public ModuleInspectResult inspect() {
         Optional<ModuleDescriptor> descriptor = getModuleDescriptor();
         String automaticModuleName = getAutomaticModuleName();
-        boolean isAutomaticModule = automaticModuleName != null;
+        boolean isAutomaticModule = !(descriptor.isPresent() || automaticModuleName == null);
         boolean isExplicitModule = descriptor.isPresent();
         String moduleName =  isAutomaticModule ? automaticModuleName : descriptor.map(ModuleDescriptor::name).orElse(null);
         String moduleVersion = descriptor.flatMap(ModuleDescriptor::version).map(version -> version.toString()).orElse(null);

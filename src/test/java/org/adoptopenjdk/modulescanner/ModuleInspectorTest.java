@@ -98,4 +98,15 @@ class ModuleInspectorTest {
         assertTrue(mrjarResult.isExplicitModule);
         assertEquals("com.acme", mrjarResult.moduleName);
     }
+
+    @Test
+    void testJarWithAutomaticModuleNameAndModuleInfo() throws Exception {
+      JarFile jar = new JarFile("./src/test/resources/jars/service.api-2018.8.17.jar");
+      ModuleInspector.ModuleInspectResult result = new ModuleInspector(jar).inspect();
+
+      assertNotNull(jar);
+      assertFalse(result.isAutomaticModule);
+      assertTrue(result.isExplicitModule);
+      assertEquals("com.hack23.cia.service.api", result.moduleName);
+    }
 }
