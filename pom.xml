@@ -14,7 +14,7 @@
 
 
     <properties>
-        <junit.jupiter.version>5.2.0</junit.jupiter.version>
+        <junit.jupiter.version>5.3.0</junit.jupiter.version>
         <jacoco.version>0.8.1</jacoco.version>
         <jdk.version>10</jdk.version>
         <maven.version>3.5.4</maven.version>
