@@ -1,5 +1,6 @@
 package org.adoptopenjdk.modulescanner;
 
+import static java.util.Collections.sort;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 
 import java.nio.file.Files;
@@ -17,6 +18,10 @@ class MainTest {
 
         var expectedLines = Files.readAllLines(testMavenRepo.resolve("expected-modulescanner.csv"));
         var actualLines = Files.readAllLines(targetOutput);
+
+        sort(expectedLines);
+        sort(actualLines);
+
         assertLinesMatch(expectedLines, actualLines);
     }
 }
