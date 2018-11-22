@@ -21,7 +21,6 @@ class MainTest {
 
         sort(expectedLines);
         sort(actualLines);
-
         assertLinesMatch(expectedLines, actualLines);
     }
 }

@@ -45,6 +45,7 @@ public class ModuleInspector {
         String moduleVersion = descriptor.flatMap(ModuleDescriptor::version).map(version -> version.toString()).orElse(null);
         List<String> dependencies = descriptor.map(ModuleDescriptor::requires)
                                               .map(requiresSet -> requiresSet.stream().map(ModuleDescriptor.Requires::name)
+                                                                                      .sorted()
                                                                                       .collect(Collectors.toList()))
                                               .orElse(List.of());
         return new ModuleInspectResult(isAutomaticModule, isExplicitModule, moduleName, moduleVersion, dependencies);
