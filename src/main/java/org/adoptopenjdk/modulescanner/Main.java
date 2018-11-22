@@ -67,7 +67,8 @@ public class Main {
         JarFile jarFile = toJarFile(artifact.path);
         if (jarFile != null) {
             var moduleInspectorResult = new ModuleInspector(jarFile).inspect();
-            var jdepsInspectorResult = new JdepsInspector(artifact.path).inspect();
+            var jdepsInspectorResult = moduleInspectorResult.isExplicitModule ?
+                    JdepsInspector.JdepsInspectResult.SKIPPED : new JdepsInspector(artifact.path).inspect();
             LOGGER.info(artifact + "\n -> " + moduleInspectorResult + "\n -> " + jdepsInspectorResult);
             printer.printAndCountLine(artifact, moduleInspectorResult, jdepsInspectorResult);
         }

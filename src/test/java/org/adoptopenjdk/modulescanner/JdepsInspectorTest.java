@@ -50,4 +50,12 @@ class JdepsInspectorTest {
         assertLinesMatch(List.of("^sun.misc.Unsafe.+$"), result.violations);
     }
 
+    @Test
+    void testToolErrorOnJar() {
+        JdepsInspector inspector = new JdepsInspector(Paths.get("./src/test/resources/jars/engine-client-2.0.0.jar"));
+        JdepsInspector.JdepsInspectResult result = inspector.inspect();
+
+        assertTrue(result.toolerror);
+    }
+
 }

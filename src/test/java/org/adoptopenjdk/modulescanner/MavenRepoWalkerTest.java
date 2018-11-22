@@ -16,7 +16,7 @@ class MavenRepoWalkerTest {
 
         assertTrue(jars.stream().anyMatch(artifact -> artifact.path.endsWith("slf4j-api-1.8.0-beta2.jar")));
         assertTrue(jars.stream().anyMatch(artifact -> artifact.path.endsWith("jackson-core-2.9.6.jar")));
-        assertEquals(2, jars.size());
+        assertEquals(3, jars.size());
         jars.forEach(artifact -> assertTrue(artifact.path.toFile().exists()));
     }
 
@@ -24,7 +24,7 @@ class MavenRepoWalkerTest {
     void testCutoff() {
         MavenRepoWalker repoWalker = new MavenRepoWalker(Paths.get("./src/test/resources/test-maven-repo"), "20180501000000");
 
-        assertEquals(1, repoWalker.getArtifactsToInspect().count());
+        assertEquals(2, repoWalker.getArtifactsToInspect().count());
     }
 
 }
