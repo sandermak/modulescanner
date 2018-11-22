@@ -1,3 +1,4 @@
 groupId,artifactId,version,moduleName,moduleVersion,moduleMode,moduleDependencies,jdepsToolError,jdepsViolations
+be.yildiz-games,engine-client,2.0.0,be.yildizgames.engine.client,-,explicit,be.yildizgames.module.scripting + be.yildizgames.common.file.xml + be.yildizgames.module.window + be.yildizgames.module.graphic + be.yildizgames.engine.shared + be.yildizgames.common.exception + be.yildizgames.common.frame + be.yildizgames.common.client + java.base + be.yildizgames.common.gameobject + be.yildizgames.common.logging + be.yildizgames.common.geometry + be.yildizgames.common.util + be.yildizgames.module.network + java.xml + be.yildizgames.module.audio + slf4j.api + be.yildizgames.common.shape + be.yildizgames.module.physics + be.yildizgames.common.model + be.yildizgames.common.file,false,-
 com.fasterxml.jackson.core,jackson-core,2.9.6,com.fasterxml.jackson.core,-,automatic,-,false,-
 org.slf4j,slf4j-api,1.8.0-beta2,org.slf4j,-,explicit,java.base,false,-

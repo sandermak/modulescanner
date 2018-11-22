@@ -3,3 +3,6 @@
 target/
 .DS_Store
 modulescanner.csv
+.classpath
+.project
+.settings/

@@ -83,6 +83,7 @@ public class JdepsInspector {
 
         /** A status indicating that the scan failed */
         public static final JdepsInspectResult FAIL = new JdepsInspectResult(true, List.of());
+        public static final JdepsInspectResult SKIPPED = new JdepsInspectResult(false, List.of());
 
         /** Whether the jdeps tool errored or not */
         public final boolean toolerror;
