@@ -14,8 +14,8 @@
 
 
     <properties>
-        <junit.jupiter.version>5.3.1</junit.jupiter.version>
-        <jacoco.version>0.8.1</jacoco.version>
+        <junit.jupiter.version>5.4.0</junit.jupiter.version>
+        <jacoco.version>0.8.3</jacoco.version>
         <jdk.version>11</jdk.version>
         <maven.version>3.5.4</maven.version>
         <maven.compiler.source>11</maven.compiler.source>
@@ -147,38 +147,45 @@
                     <artifactId>maven-site-plugin</artifactId>
                     <version>3.7.1</version>
                 </plugin>
-                <!-- Disable Surefire by binding its 'default-test' goal to phase 'none'. -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.0</version>
-                    <executions>
-                        <execution>
-                            <id>default-test</id>
-                            <phase>none</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
-            <!-- Use junit-platform-maven-plugin to run all tests... -->
-            <plugin>
-                <groupId>de.sormuras</groupId>
-                <artifactId>junit-platform-maven-plugin</artifactId>
-                <version>0.0.12</version>
                 <executions>
                     <execution>
+                        <id>pre-unit-test</id>
                         <goals>
-                            <goal>launch-junit-platform</goal>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>jacoco.java.option</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <!-- Use junit-platform-maven-plugin to run all tests... -->
+            <plugin>
+                <groupId>de.sormuras.junit</groupId>
+                <artifactId>junit-platform-maven-plugin</artifactId>
+                <version>1.0.0-M5</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <executor>JAVA</executor>
+                    <javaOptions>
+                        <additionalOptions>
+                            <jacoco>${jacoco.java.option}</jacoco>
+                        </additionalOptions>
+                    </javaOptions>
+                </configuration>
             </plugin>
         </plugins>
     </build>
